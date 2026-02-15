@@ -38,7 +38,7 @@ public class UsuarioService {
     private UsuarioSaidaDTO toSaidaDTO(Usuario usuario) {
         String nomeFoto =
                 (usuario.getUrlfoto() == null || usuario.getUrlfoto().isBlank())
-                        ? "default-photo.png"
+                        ? FOTO_PADRAO
                         : usuario.getUrlfoto();
 
         String urlFoto = "http://localhost:8080/uploads/usuarios/" + nomeFoto;
@@ -149,22 +149,72 @@ public class UsuarioService {
     }
 
     // UPDATE (sem senha)
-    public UsuarioSaidaDTO editar(UsuarioSaidaDTO dto, Long id) {
+    public UsuarioSaidaDTO editar(UsuarioEntradaDTO dto, Long id) throws IOException {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        NivelAcesso nivelAcesso = nivelAcessoRepository.findById(dto.nivelAcessoId())
+        NivelAcesso nivelAcesso = nivelAcessoRepository.findById(dto.getNivelAcessoId())
                 .orElseThrow(() -> new RuntimeException("Nível de acesso não encontrado"));
 
-        usuario.setNome(dto.nome());
-        usuario.setEmail(dto.email());
+        usuario.setNome(dto.getNome());
+        usuario.setEmail(dto.getEmail());
         usuario.setNivelAcesso(nivelAcesso);
+
+        // 🔥 Se o usuário enviou nova foto
+        if (dto.getFoto() != null && !dto.getFoto().isEmpty()) {
+
+            // 1️⃣ Apagar foto antiga (se não for a padrão)
+            String fotoAntiga = usuario.getUrlfoto();
+
+            if (fotoAntiga != null &&
+                    !fotoAntiga.equals(FOTO_PADRAO)) {
+
+                Path caminhoFotoAntiga = Paths.get(uploadDir + fotoAntiga);
+
+                try {
+                    Files.deleteIfExists(caminhoFotoAntiga);
+                } catch (IOException e) {
+                    System.out.println("Não foi possível excluir a foto antiga: " + fotoAntiga);
+                }
+            }
+
+            // 2️⃣ Salvar nova foto
+            String nomeArquivo = UUID.randomUUID() + "_" + dto.getFoto().getOriginalFilename();
+            Path caminhoNovaFoto = Paths.get(uploadDir + nomeArquivo);
+
+            Files.createDirectories(caminhoNovaFoto.getParent());
+            Files.copy(dto.getFoto().getInputStream(),
+                    caminhoNovaFoto,
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            usuario.setUrlfoto(nomeArquivo);
+        }
 
         return toSaidaDTO(usuarioRepository.save(usuario));
     }
 
     public void excluir(Long id) {
-        usuarioRepository.deleteById(id);
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        String foto = usuario.getUrlfoto();
+
+        // 🔥 Se tiver foto e não for a padrão, apagar do disco
+        if (foto != null && !foto.equals(FOTO_PADRAO)) {
+
+            Path caminhoFoto = Paths.get(uploadDir + foto);
+
+            try {
+                Files.deleteIfExists(caminhoFoto);
+                System.out.println("Foto excluída: " + foto);
+            } catch (IOException e) {
+                System.out.println("Erro ao excluir foto: " + foto);
+            }
+        }
+
+        // Agora exclui do banco
+        usuarioRepository.delete(usuario);
     }
 }

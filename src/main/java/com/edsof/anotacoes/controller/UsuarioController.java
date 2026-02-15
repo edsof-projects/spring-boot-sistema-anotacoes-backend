@@ -35,9 +35,12 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
     }
 
-    @PutMapping("/{id}")
-    public UsuarioSaidaDTO editar(@RequestBody UsuarioSaidaDTO dto, @PathVariable Long id){
-        return usuarioService.editar(dto, id);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UsuarioSaidaDTO> editar(
+            @PathVariable Long id,
+            @ModelAttribute UsuarioEntradaDTO dto
+    ) throws IOException {
+        return ResponseEntity.ok(usuarioService.editar(dto, id));
     }
 
     @DeleteMapping("/{id}")
