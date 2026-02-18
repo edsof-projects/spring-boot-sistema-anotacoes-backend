@@ -1,17 +1,20 @@
 package com.edsof.anotacoes.infrastructure.repository;
 
-import com.edsof.anotacoes.infrastructure.dto.UsuarioSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmail(String email);
 
+    Optional<Usuario> findByEmail(String email);
+
     @Query("""
-        SELECT new com.edsof.anotacoes.infrastructure.dto.UsuarioSaidaDTO(
+        SELECT new com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO(
             u.id,
             u.nome,
             u.email,

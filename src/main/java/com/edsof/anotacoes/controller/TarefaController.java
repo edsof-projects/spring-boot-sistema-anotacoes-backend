@@ -1,8 +1,8 @@
 package com.edsof.anotacoes.controller;
 
 import com.edsof.anotacoes.business.service.TarefaService;
-import com.edsof.anotacoes.infrastructure.dto.TarefaEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.TarefaSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.TarefaEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.TarefaSaidaDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tarefa")
+@RequestMapping("/tarefas")
 public class TarefaController {
 
     private final TarefaService tarefaService;

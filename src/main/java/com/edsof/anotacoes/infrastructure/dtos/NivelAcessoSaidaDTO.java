@@ -1,4 +1,4 @@
-package com.edsof.anotacoes.infrastructure.dto;
+package com.edsof.anotacoes.infrastructure.dtos;
 
 public record NivelAcessoSaidaDTO(
         Long id,

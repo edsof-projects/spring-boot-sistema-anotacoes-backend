@@ -1,8 +1,8 @@
 package com.edsof.anotacoes.controller;
 
 import com.edsof.anotacoes.business.service.AnotacaoService;
-import com.edsof.anotacoes.infrastructure.dto.AnotacaoEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.AnotacaoSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.AnotacaoEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.AnotacaoSaidaDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/anotacao")
+@RequestMapping("/anotacoes")
 public class AnotacaoController {
 
     private final AnotacaoService anotacaoService;

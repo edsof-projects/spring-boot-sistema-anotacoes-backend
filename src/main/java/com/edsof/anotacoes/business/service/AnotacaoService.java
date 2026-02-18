@@ -1,7 +1,7 @@
 package com.edsof.anotacoes.business.service;
 
-import com.edsof.anotacoes.infrastructure.dto.AnotacaoEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.AnotacaoSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.AnotacaoEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.AnotacaoSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.Anotacao;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.repository.AnotacaoRepository;

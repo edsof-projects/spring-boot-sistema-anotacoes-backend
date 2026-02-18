@@ -1,6 +1,6 @@
 package com.edsof.anotacoes.infrastructure.repository;
 
-import com.edsof.anotacoes.infrastructure.dto.NivelAcessoSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.NivelAcessoSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.NivelAcesso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +13,7 @@ public interface NivelAcessoRepository extends JpaRepository<NivelAcesso, Long> 
     Optional<NivelAcesso>findByTipo(String tipo);
 
     @Query("""
-        SELECT new com.edsof.anotacoes.infrastructure.dto.NivelAcessoSaidaDTO(
+        SELECT new com.edsof.anotacoes.infrastructure.dtos.NivelAcessoSaidaDTO(
             n.id,
             n.tipo
         )

@@ -1,4 +1,4 @@
-package com.edsof.anotacoes.infrastructure.dto;
+package com.edsof.anotacoes.infrastructure.dtos;
 
 import com.edsof.anotacoes.infrastructure.enums.StatusTarefa;
 

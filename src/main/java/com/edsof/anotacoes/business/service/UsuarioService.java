@@ -1,7 +1,7 @@
 package com.edsof.anotacoes.business.service;
 
-import com.edsof.anotacoes.infrastructure.dto.UsuarioEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.UsuarioSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.UsuarioEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.NivelAcesso;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.exceptions.ConflictException;
@@ -108,7 +108,6 @@ public class UsuarioService {
 
     // CREATE
     public UsuarioSaidaDTO cadastrar(UsuarioEntradaDTO dto) throws IOException {
-        System.out.println("Entrou no cadastrar");
 
         // Valida email
         emailExiste(dto.getEmail());
