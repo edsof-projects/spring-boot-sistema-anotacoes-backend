@@ -1,7 +1,7 @@
 package com.edsof.anotacoes.business.service;
 
-import com.edsof.anotacoes.infrastructure.dto.NivelAcessoEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.NivelAcessoSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.NivelAcessoEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.NivelAcessoSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.NivelAcesso;
 import com.edsof.anotacoes.infrastructure.repository.NivelAcessoRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.edsof.anotacoes.infrastructure.dto;
+package com.edsof.anotacoes.infrastructure.dtos;
 
 import org.springframework.web.multipart.MultipartFile;
 import lombok.Data;

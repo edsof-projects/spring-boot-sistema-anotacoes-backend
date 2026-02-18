@@ -1,7 +1,7 @@
 package com.edsof.anotacoes.business.service;
 
-import com.edsof.anotacoes.infrastructure.dto.TarefaEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.TarefaSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.TarefaEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.TarefaSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.Tarefa;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.enums.StatusTarefa;

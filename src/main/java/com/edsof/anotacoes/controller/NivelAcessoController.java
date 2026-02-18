@@ -1,8 +1,8 @@
 package com.edsof.anotacoes.controller;
 
 import com.edsof.anotacoes.business.service.NivelAcessoService;
-import com.edsof.anotacoes.infrastructure.dto.NivelAcessoEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dto.NivelAcessoSaidaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.NivelAcessoEntradaDTO;
+import com.edsof.anotacoes.infrastructure.dtos.NivelAcessoSaidaDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/nivelacesso")
+@RequestMapping("/nivelacessos")
 public class NivelAcessoController {
 
     private final NivelAcessoService nivelAcessoService;
