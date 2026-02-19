@@ -4,6 +4,7 @@ import com.edsof.anotacoes.business.service.UsuarioService;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioEntradaDTO;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioLoginDTO;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
+import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,31 +27,42 @@ public class UsuarioController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    // LISTAR TODOS
     @GetMapping
-    public List<UsuarioSaidaDTO>listarTodos(){
+    public List<UsuarioSaidaDTO> listarTodos() {
         return usuarioService.listarTodos();
     }
 
+    // BUSCAR POR ID
     @GetMapping("/{id}")
-    public UsuarioSaidaDTO buscarPorId(@PathVariable Long id){
+    public UsuarioSaidaDTO buscarPorId(@PathVariable Long id) {
         return usuarioService.buscarPorId(id);
     }
 
+    // BUSCAR POR EMAIL
+    @GetMapping("/email")
+    public ResponseEntity<Usuario> buscaUsuarioPorEmail(@RequestParam("email") String email) {
+        return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
+    }
+
+    // LOGIN
     @PostMapping("/login")
-    public String login(@RequestBody UsuarioLoginDTO usuarioLoginDTO){
+    public String login(@RequestBody UsuarioLoginDTO usuarioLoginDTO) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(usuarioLoginDTO.email(),
                         usuarioLoginDTO.senha())
         );
-        return "Bearer" + jwtUtil.generateToken(authentication.getName());
+        return "Bearer " + jwtUtil.generateToken(authentication.getName());
     }
 
+    // CADASTRAR
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioSaidaDTO> cadastrar(@ModelAttribute UsuarioEntradaDTO dto) throws IOException {
         UsuarioSaidaDTO usuarioCadastrado = usuarioService.cadastrar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
     }
 
+    // EDITAR POR ID
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioSaidaDTO> editar(
             @PathVariable Long id,
@@ -59,10 +71,17 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.editar(dto, id));
     }
 
+    // DELETAR POR ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void>excluir(@PathVariable Long id){
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
         usuarioService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 
+    // DELETAR POR EMAIL
+    @DeleteMapping("/email/{email}")
+    public ResponseEntity<Void> deletaUsuarioPorEmail(@PathVariable String email) {
+        usuarioService.deletaUsuarioPorEmail(email);
+        return ResponseEntity.ok().build();
+    }
 }
