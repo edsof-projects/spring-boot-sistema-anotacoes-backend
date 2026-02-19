@@ -5,13 +5,14 @@ import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.NivelAcesso;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.exceptions.ConflictException;
+import com.edsof.anotacoes.infrastructure.exceptions.ResourceNotFoundException;
 import com.edsof.anotacoes.infrastructure.repository.NivelAcessoRepository;
 import com.edsof.anotacoes.infrastructure.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -104,6 +105,17 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         return toSaidaDTO(usuario);
+    }
+
+    public Usuario buscarUsuarioPorEmail(String email){
+        return usuarioRepository.findByEmail(email).orElseThrow(
+                ()-> new ResourceNotFoundException("Email não encontrado : "+email));
+    }
+
+    public void deletaUsuarioPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        usuarioRepository.delete(usuario);
     }
 
     // CREATE

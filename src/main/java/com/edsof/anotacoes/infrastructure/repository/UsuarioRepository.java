@@ -2,6 +2,7 @@ package com.edsof.anotacoes.infrastructure.repository;
 
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,6 +13,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmail(String email);
 
     Optional<Usuario> findByEmail(String email);
+
+    @Transactional
+    void deleteByEmail(String email);
 
     @Query("""
         SELECT new com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO(
