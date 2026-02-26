@@ -6,6 +6,7 @@ import com.edsof.anotacoes.infrastructure.entity.Anotacao;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.repository.AnotacaoRepository;
 import com.edsof.anotacoes.infrastructure.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AnotacaoService {
 
-    private final AnotacaoRepository anotacaoRepository;
+    public final AnotacaoRepository anotacaoRepository;
     private final UsuarioRepository usuarioRepository;
 
     // Entity → DTO de SAÍDA
@@ -31,20 +33,14 @@ public class AnotacaoService {
     }
 
     // DTO de ENTRADA → Entity
-    private Anotacao toEntity(AnotacaoEntradaDTO dto) {
-
-        if (dto.usuarioId() == null) {
-            throw new RuntimeException("usuarioId é obrigatório");
-        }
-
-        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
+    private Anotacao toEntity(AnotacaoEntradaDTO dto, Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Id do usuário não encontrado"));
 
         Anotacao anotacao = new Anotacao();
         anotacao.setTitulo(dto.titulo());
         anotacao.setDescricao(dto.descricao());
         anotacao.setUsuario(usuario);
-        anotacao.setDatacad(LocalDate.now());
 
         return anotacao;
     }
@@ -61,7 +57,6 @@ public class AnotacaoService {
 
     // CREATE
     public Anotacao cadastrar(AnotacaoEntradaDTO dto) {
-
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -70,6 +65,7 @@ public class AnotacaoService {
         anotacao.setDescricao(dto.descricao());
         anotacao.setUsuario(usuario);
         anotacao.setDatacad(LocalDate.now());
+
         return anotacaoRepository.save(anotacao);
     }
 

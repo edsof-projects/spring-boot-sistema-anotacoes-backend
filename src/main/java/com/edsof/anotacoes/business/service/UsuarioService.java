@@ -30,6 +30,7 @@ public class UsuarioService {
     private final UsuarioRepository     usuarioRepository;
     private final NivelAcessoRepository nivelAcessoRepository;
     private final PasswordEncoder       passwordEncoder;
+
     private static final String FOTO_PADRAO = "default-photo.png";
 
     @Value("${app.upload.dir}")
@@ -126,6 +127,9 @@ public class UsuarioService {
 
         // Converte DTO → entidade
         Usuario usuario = toEntity(dto);
+
+        // Criptografa a senha antes de salvar
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
         // Upload de foto
         if (dto.getFoto() != null && !dto.getFoto().isEmpty()) {
