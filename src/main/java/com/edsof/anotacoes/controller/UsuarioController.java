@@ -2,7 +2,6 @@ package com.edsof.anotacoes.controller;
 
 import com.edsof.anotacoes.business.service.UsuarioService;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioEntradaDTO;
-import com.edsof.anotacoes.infrastructure.dtos.UsuarioLoginDTO;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.security.JwtUtil;
@@ -11,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -45,16 +42,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
     }
 
-    // LOGIN
-    @PostMapping("/login")
-    public String login(@RequestBody UsuarioLoginDTO usuarioLoginDTO) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(usuarioLoginDTO.email(),
-                        usuarioLoginDTO.senha())
-        );
-        return "Bearer " + jwtUtil.generateToken(authentication.getName());
-    }
-
     // CADASTRAR
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioSaidaDTO> cadastrar(@ModelAttribute UsuarioEntradaDTO dto) throws IOException {
@@ -84,4 +71,5 @@ public class UsuarioController {
         usuarioService.deletaUsuarioPorEmail(email);
         return ResponseEntity.ok().build();
     }
+
 }
