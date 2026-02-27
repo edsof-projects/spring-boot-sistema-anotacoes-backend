@@ -21,5 +21,4 @@ public interface NivelAcessoRepository extends JpaRepository<NivelAcesso, Long> 
         ORDER BY UPPER(TRIM(n.tipo))
     """)
     List<NivelAcessoSaidaDTO> listarAcessos();
-
 }

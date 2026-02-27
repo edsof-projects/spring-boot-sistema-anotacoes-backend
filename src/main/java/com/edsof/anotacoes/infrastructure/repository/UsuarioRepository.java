@@ -31,5 +31,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
         ORDER BY UPPER(TRIM(u.nome))
     """)
     List<UsuarioSaidaDTO> listarUsuarios();
-
 }
