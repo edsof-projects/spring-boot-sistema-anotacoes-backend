@@ -21,5 +21,4 @@ public interface AnotacaoRepository extends JpaRepository<Anotacao, Long> {
     ORDER BY a.titulo
     """)
     List<AnotacaoSaidaDTO> listarAnotacoes();
-
 }
