@@ -8,6 +8,9 @@ import com.edsof.anotacoes.infrastructure.enums.StatusTarefa;
 import com.edsof.anotacoes.infrastructure.repository.TarefaRepository;
 import com.edsof.anotacoes.infrastructure.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -53,12 +56,32 @@ public class TarefaService {
         return tarefa;
     }
 
-    public List<TarefaSaidaDTO> listarTarefas() {
+    public List<TarefaSaidaDTO> listarTarefasUsuarioLogado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-        Long usuarioId  = 2L;      // usuário simulado
-        boolean isAdmin = true;   // troque para true e veja todas
+        if (isAdmin) {
+            // Admin vê todas
+            return tarefaRepository.listarTodasTarefas();
+        } else {
+            // Usuário comum vê só as próprias
+            Long usuarioId = getUsuarioLogadoId();
+            return tarefaRepository.listarTarefasPorUsuario(usuarioId);
+        }
+    }
 
-        return tarefaRepository.listarTarefas(usuarioId, isAdmin);
+    private Long getUsuarioLogadoId() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email;
+
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername(); // username = email
+        } else {
+            email = principal.toString();
+        }
+
+        return usuarioRepository.findIdByEmail(email);
     }
 
 

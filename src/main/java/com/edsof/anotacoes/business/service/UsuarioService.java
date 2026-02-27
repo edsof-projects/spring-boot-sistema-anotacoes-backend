@@ -163,6 +163,24 @@ public class UsuarioService {
         }
     }
 
+    // Busca o usuário pelo email (email é usado como username no Spring Security)
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    // Converte a entidade para DTO de saída
+    public UsuarioSaidaDTO converterParaDTO(Usuario usuario) {
+        return new UsuarioSaidaDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getNivelAcesso().getTipo(),
+                usuario.getNivelAcesso().getId(),
+                usuario.getUrlfoto()
+        );
+    }
+
     // UPDATE (sem senha)
     public UsuarioSaidaDTO editar(UsuarioEntradaDTO dto, Long id) throws IOException {
 

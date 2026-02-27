@@ -8,6 +8,9 @@ import com.edsof.anotacoes.infrastructure.repository.AnotacaoRepository;
 import com.edsof.anotacoes.infrastructure.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,8 +21,8 @@ import java.util.List;
 @Transactional
 public class AnotacaoService {
 
-    public final AnotacaoRepository anotacaoRepository;
-    private final UsuarioRepository usuarioRepository;
+    public  final AnotacaoRepository anotacaoRepository;
+    private final UsuarioRepository  usuarioRepository;
 
     // Entity → DTO de SAÍDA
     private AnotacaoSaidaDTO toSaidaDTO(Anotacao anotacao) {
@@ -45,8 +48,30 @@ public class AnotacaoService {
         return anotacao;
     }
 
-    public List<AnotacaoSaidaDTO> listarTodos() {
-        return anotacaoRepository.listarAnotacoes();
+    private Long getUsuarioLogadoId() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email;
+
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        return usuarioRepository.findIdByEmail(email);
+    }
+
+    public List<AnotacaoSaidaDTO> listarAnotacoesUsuarioLogado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return anotacaoRepository.listarTodasAnotacoes();
+        } else {
+            Long usuarioId = getUsuarioLogadoId();
+            return anotacaoRepository.listarAnotacoesPorUsuario(usuarioId);
+        }
     }
 
     public AnotacaoSaidaDTO buscarPorId(Long id) {

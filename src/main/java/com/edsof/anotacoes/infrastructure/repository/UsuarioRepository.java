@@ -5,6 +5,7 @@ import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmail(String email);
 
     Optional<Usuario> findByEmail(String email);
+
+    @Query("SELECT u.id FROM Usuario u WHERE u.email = :email")
+    Long findIdByEmail(@Param("email") String email);
 
     @Transactional
     void deleteByEmail(String email);
@@ -31,4 +35,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
         ORDER BY UPPER(TRIM(u.nome))
     """)
     List<UsuarioSaidaDTO> listarUsuarios();
+
 }

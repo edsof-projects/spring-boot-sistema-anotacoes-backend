@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -40,6 +41,14 @@ public class UsuarioController {
     @GetMapping("/email")
     public ResponseEntity<Usuario> buscaUsuarioPorEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioSaidaDTO> getUsuarioLogado(Authentication auth) {
+        // Pega o usuário logado pelo email do token
+        Usuario usuarioLogado      = usuarioService.buscarPorEmail(auth.getName());
+        UsuarioSaidaDTO usuarioDTO = usuarioService.converterParaDTO(usuarioLogado);
+        return ResponseEntity.ok(usuarioDTO);
     }
 
     // CADASTRAR
