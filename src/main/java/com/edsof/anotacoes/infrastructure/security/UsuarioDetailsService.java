@@ -21,6 +21,7 @@ public class UsuarioDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         String role = usuario.getNivelAcesso().getTipo();
+        System.out.println("TIPO NIVEL ACESSO: " + usuario.getNivelAcesso().getTipo());
         return new UsuarioDetails(usuario.getEmail(), usuario.getSenha(), role);
     }
 }
