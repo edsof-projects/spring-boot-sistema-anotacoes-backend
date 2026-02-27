@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +23,9 @@ public class AnotacaoController {
     private final JwtUtil jwtUtil;
 
     @GetMapping
-    public List<AnotacaoSaidaDTO> listarTodas() {
-        return anotacaoService.listarTodos();
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public List<AnotacaoSaidaDTO> listarAnotacoes() {
+        return anotacaoService.listarAnotacoesUsuarioLogado();
     }
 
     @GetMapping("/{id}")

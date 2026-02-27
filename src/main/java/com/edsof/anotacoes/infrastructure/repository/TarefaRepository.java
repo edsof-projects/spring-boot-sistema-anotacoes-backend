@@ -9,6 +9,24 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
+
+    @Query("""
+    SELECT new com.edsof.anotacoes.infrastructure.dtos.TarefaSaidaDTO(
+        t.id,
+        t.titulo,
+        t.historico,
+        t.usuario.id,
+        t.usuario.nome,
+        t.data_fechamento,
+        t.status
+    )
+    FROM Tarefa t    
+    ORDER BY t.titulo
+""")
+
+    List<TarefaSaidaDTO> listarTodasTarefas();
+
+
     @Query("""
     SELECT new com.edsof.anotacoes.infrastructure.dtos.TarefaSaidaDTO(
         t.id,
@@ -21,14 +39,9 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
     )
     FROM Tarefa t
     WHERE t.status = 'ABERTA'
-      AND (
-           :isAdmin = true
-           OR t.usuario.id = :usuarioId
-      )
+    AND t.usuario.id = :usuarioId
     ORDER BY t.titulo
 """)
-    List<TarefaSaidaDTO> listarTarefas(
-            @Param("usuarioId") Long usuarioId,
-            @Param("isAdmin") boolean isAdmin
-    );
+     List<TarefaSaidaDTO> listarTarefasPorUsuario(@Param("usuarioId") Long usuarioId);
+
 }
