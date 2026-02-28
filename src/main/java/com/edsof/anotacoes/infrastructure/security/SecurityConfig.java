@@ -42,7 +42,6 @@ public class SecurityConfig {
 
         JwtRequestFilter jwtRequestFilter =
                 new JwtRequestFilter(jwtUtil, userDetailsService);
-
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -50,12 +49,12 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**") .permitAll()
                         .requestMatchers("/auth/login")             .permitAll()
+                        .requestMatchers("/auth/**")   .permitAll()
                         .requestMatchers("/uploads/**")             .permitAll()
-
                         .requestMatchers("/nivelacessos/**")        .hasRole("ADMIN")
                         .requestMatchers("/usuarios/me")            .authenticated()
                         .requestMatchers("/usuarios/**")            .hasRole("ADMIN")
@@ -69,8 +68,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                .addFilterBefore(jwtRequestFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
