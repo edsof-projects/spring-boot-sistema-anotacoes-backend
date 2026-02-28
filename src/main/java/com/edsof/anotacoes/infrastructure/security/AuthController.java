@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,9 @@ public class AuthController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
@@ -108,6 +112,39 @@ public class AuthController {
         return ResponseEntity.ok(
                 Map.of("message",
                         "Se e-mail cadastrado, acesse sua caixa de entrada para instruções.")
+        );
+    }
+
+    @PostMapping("/resetar-senha")
+    public ResponseEntity<?> resetarSenha(@RequestBody Map<String, String> body) {
+
+        String token = body.get("token");
+        String novaSenha = body.get("novaSenha");
+
+        Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(token);
+
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Token inválido."));
+        }
+
+        PasswordResetToken resetToken = tokenOpt.get();
+
+        if (resetToken.getExpiration().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Token expirado."));
+        }
+
+        Usuario usuario = resetToken.getUsuario();
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+
+        // remove token após uso
+        tokenRepository.delete(resetToken);
+
+        return ResponseEntity.ok(
+                Map.of("message", "Senha redefinida com sucesso.")
         );
     }
 
