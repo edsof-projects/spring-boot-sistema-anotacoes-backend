@@ -1,5 +1,6 @@
 package com.edsof.anotacoes.infrastructure.entity;
 
+import com.edsof.anotacoes.infrastructure.enums.StatusTarefa;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +14,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tblanotacoes")
-public class Anotacao {
+@Table(name = "tbltarefas")
+public class Tarefa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +24,22 @@ public class Anotacao {
     @Column(name = "titulo", length = 200, nullable = false)
     private String titulo;
 
-    @Column(name = "descricao", columnDefinition = "TEXT",nullable = false)
-    private String descricao;
+    @Column(name = "historico", columnDefinition = "TEXT",nullable = false)
+    private String historico;
 
     @ManyToOne
     @JoinColumn(name = "usuarioid", referencedColumnName = "id", nullable = false)
     private Usuario usuario;
 
-    @Column(name = "datacad", nullable = false)
-    private LocalDate datacad;
+    @Column(name = "data_abertura", nullable = false)
+    private LocalDate data_abertura;
+
+    @Column(name = "data_fechamento")
+    private LocalDate data_fechamento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 10)
+    private StatusTarefa status;
 
 }
 
