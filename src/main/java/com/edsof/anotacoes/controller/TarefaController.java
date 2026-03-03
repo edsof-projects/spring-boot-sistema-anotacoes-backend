@@ -3,6 +3,7 @@ package com.edsof.anotacoes.controller;
 import com.edsof.anotacoes.business.service.TarefaService;
 import com.edsof.anotacoes.infrastructure.dtos.TarefaEntradaDTO;
 import com.edsof.anotacoes.infrastructure.dtos.TarefaSaidaDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class TarefaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TarefaSaidaDTO> editar(
+            @Valid
             @PathVariable Long id,
             @RequestBody TarefaEntradaDTO dto
     ) {
