@@ -11,5 +11,6 @@ public record TarefaSaidaDTO(
         Long usuarioId,
         String nomeUsuario,
         LocalDate data_fechamento,
+        LocalDate data_prazo,
         StatusTarefa status
 ) {}

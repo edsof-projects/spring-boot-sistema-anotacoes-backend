@@ -6,6 +6,7 @@ import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.repository.PasswordResetTokenRepository;
 import com.edsof.anotacoes.infrastructure.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -77,7 +78,10 @@ public class AuthController {
             ));
 
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(403).body("Credenciais inválidas");
+            // log interno para auditoria
+            System.out.println("Tentativa de login inválida: " + request.getEmail());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Credenciais inválidas"));
         }
     }
 
