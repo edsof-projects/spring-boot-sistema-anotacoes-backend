@@ -18,6 +18,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query("SELECT u.id FROM Usuario u WHERE u.email = :email")
     Long findIdByEmail(@Param("email") String email);
 
+    @Query("SELECT u.urlfoto FROM Usuario u WHERE u.id = :id")
+    String getUrlFoto(@Param("id") long id);
+
     @Transactional
     void deleteByEmail(String email);
 

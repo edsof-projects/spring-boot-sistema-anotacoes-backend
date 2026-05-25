@@ -43,6 +43,15 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
     }
 
+    @GetMapping("/usuarios/{id}/foto")
+    public ResponseEntity<String> getFotoUsuario(@PathVariable Long id) {
+        String urlFoto = usuarioService.buscarUrlFoto(id);
+        if (urlFoto != null) {
+            return ResponseEntity.ok(urlFoto);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UsuarioSaidaDTO> getUsuarioLogado(Authentication auth) {
         // Pega o usuário logado pelo email do token
