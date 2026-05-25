@@ -43,7 +43,7 @@ public class UsuarioService {
                         ? FOTO_PADRAO
                         : usuario.getUrlfoto();
 
-        String urlFoto = "http://localhost:8080/uploads/usuarios/" + nomeFoto;
+        String urlFoto = "http://localhost:8081/uploads/usuarios/" + nomeFoto;
 
         System.out.println(usuario.getNivelAcesso());
 
@@ -106,6 +106,10 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         return toSaidaDTO(usuario);
+    }
+
+    public String buscarUrlFoto(Long id) {
+        return usuarioRepository.getUrlFoto(id);
     }
 
     public Usuario buscarUsuarioPorEmail(String email){
