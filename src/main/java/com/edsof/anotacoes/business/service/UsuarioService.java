@@ -57,6 +57,26 @@ public class UsuarioService {
         );
     }
 
+    // DTO de ENTRADA → Entity
+    private Usuario toEntity(UsuarioEntradaDTO dto) {
+
+        if (dto.getNivelAcessoId() == null) {
+            throw new RuntimeException("nivelAcessoId é obrigatório");
+        }
+
+        NivelAcesso nivelAcesso = nivelAcessoRepository.findById(dto.getNivelAcessoId())
+                .orElseThrow(() -> new RuntimeException("Nível de acesso não encontrado"));
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.getNome());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        usuario.setNivelAcesso(nivelAcesso);
+        usuario.setDatacad(LocalDate.now());
+
+        return usuario;
+    }
+
     public Usuario salvarFoto(Long id, MultipartFile file) throws IOException {
 
         Usuario usuario = usuarioRepository.findById(id)
@@ -76,26 +96,6 @@ public class UsuarioService {
         usuario.setUrlfoto(fileName);
 
         return usuarioRepository.save(usuario);
-    }
-
-    // DTO de ENTRADA → Entity
-    private Usuario toEntity(UsuarioEntradaDTO dto) {
-
-        if (dto.getNivelAcessoId() == null) {
-            throw new RuntimeException("nivelAcessoId é obrigatório");
-        }
-
-        NivelAcesso nivelAcesso = nivelAcessoRepository.findById(dto.getNivelAcessoId())
-                .orElseThrow(() -> new RuntimeException("Nível de acesso não encontrado"));
-
-        Usuario usuario = new Usuario();
-        usuario.setNome(dto.getNome());
-        usuario.setEmail(dto.getEmail());
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        usuario.setNivelAcesso(nivelAcesso);
-        usuario.setDatacad(LocalDate.now());
-
-        return usuario;
     }
 
     public List<UsuarioSaidaDTO> listarTodos() {
@@ -123,7 +123,7 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 
-    // CREATE
+    // CREATE USUÁRIO
     public UsuarioSaidaDTO cadastrar(UsuarioEntradaDTO dto) throws IOException {
 
         // Valida email
