@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +44,15 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
     }
 
+    @GetMapping("/usuarios/{id}/foto")
+    public ResponseEntity<String> getFotoUsuario(@PathVariable Long id) {
+        String urlFoto = usuarioService.buscarUrlFoto(id);
+        if (urlFoto != null) {
+            return ResponseEntity.ok(urlFoto);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UsuarioSaidaDTO> getUsuarioLogado(Authentication auth) {
         // Pega o usuário logado pelo email do token
@@ -53,17 +63,42 @@ public class UsuarioController {
 
     // CADASTRAR
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UsuarioSaidaDTO> cadastrar(@ModelAttribute UsuarioEntradaDTO dto) throws IOException {
-        UsuarioSaidaDTO usuarioCadastrado = usuarioService.cadastrar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
+    public ResponseEntity<UsuarioSaidaDTO> cadastrar(
+
+            @RequestPart("usuario")
+            UsuarioEntradaDTO dto,
+
+            @RequestPart(value = "foto", required = false)
+            MultipartFile foto
+
+    ) throws IOException {
+
+        dto.setFoto(foto);
+
+        UsuarioSaidaDTO usuarioCadastrado =
+                usuarioService.cadastrar(dto);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(usuarioCadastrado);
     }
 
     // EDITAR POR ID
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioSaidaDTO> editar(
+
             @PathVariable Long id,
-            @ModelAttribute UsuarioEntradaDTO dto
+
+            @RequestPart("usuario")
+            UsuarioEntradaDTO dto,
+
+            @RequestPart(value = "foto", required = false)
+            MultipartFile foto
+
     ) throws IOException {
+
+        dto.setFoto(foto);
+
         return ResponseEntity.ok(usuarioService.editar(dto, id));
     }
 

@@ -53,11 +53,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**") .permitAll()
                         .requestMatchers("/auth/login")             .permitAll()
-                        .requestMatchers("/auth/**")   .permitAll()
                         .requestMatchers("/uploads/**")             .permitAll()
                         .requestMatchers("/nivelacessos/**")        .hasRole("ADMIN")
                         .requestMatchers("/usuarios/me")            .authenticated()
-                        .requestMatchers("/usuarios/**")            .hasRole("ADMIN")
+
+                        // GET liberado para ADMIN e USER
+                        .requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
+
+                        //POST, PUT, DELETE só para ADMIN
+                        .requestMatchers(HttpMethod.POST, "/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole("ADMIN")
 
                         .requestMatchers("/tarefas/**")             .hasAnyRole("ADMIN","USER")
                         .requestMatchers("/anotacoes/**")           .hasAnyRole("ADMIN","USER")
@@ -93,15 +100,12 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 

@@ -1,6 +1,7 @@
 package com.edsof.anotacoes.infrastructure.entity;
 
 import com.edsof.anotacoes.infrastructure.enums.StatusTarefa;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,9 +38,12 @@ public class Tarefa {
     @Column(name = "data_fechamento")
     private LocalDate data_fechamento;
 
+    @Column(name = "data_prazo")
+    @FutureOrPresent(message = "O prazo deve ser hoje ou uma data futura")
+    private LocalDate data_prazo;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
     private StatusTarefa status;
 
 }
-

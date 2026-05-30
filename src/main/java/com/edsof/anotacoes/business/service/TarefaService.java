@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TarefaService {
     
-    private final TarefaRepository tarefaRepository;
+    private final TarefaRepository  tarefaRepository;
     private final UsuarioRepository usuarioRepository;
 
     // Entity → DTO de SAÍDA
@@ -33,6 +33,7 @@ public class TarefaService {
                 tarefa.getUsuario().getId(),
                 tarefa.getUsuario().getNome(),
                 tarefa.getData_fechamento(),
+                tarefa.getData_prazo(),
                 tarefa.getStatus()
         );
     }
@@ -52,6 +53,7 @@ public class TarefaService {
         tarefa.setHistorico(dto.historico());
         tarefa.setUsuario(usuario);
         tarefa.setData_abertura(LocalDate.now());
+        tarefa.setData_prazo(dto.data_prazo());
 
         return tarefa;
     }
@@ -103,6 +105,7 @@ public class TarefaService {
         tarefa.setUsuario(usuario);
         tarefa.setData_abertura(LocalDate.now());
         tarefa.setStatus(StatusTarefa.ABERTA);
+        tarefa.setData_prazo(dto.data_prazo());
 
         return tarefaRepository.save(tarefa);
 
@@ -122,6 +125,12 @@ public class TarefaService {
 
         tarefa.setTitulo(dto.titulo());
         tarefa.setHistorico(dto.historico());
+
+        // valida prazo
+        if (dto.data_prazo() != null && dto.data_prazo().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("O prazo deve ser hoje ou uma data futura");
+        }
+        tarefa.setData_prazo(dto.data_prazo());
 
         if (dto.data_fechamento() != null) {
             tarefa.setData_fechamento(dto.data_fechamento());

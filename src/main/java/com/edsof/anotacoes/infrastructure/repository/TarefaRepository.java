@@ -18,10 +18,11 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
         t.usuario.id,
         t.usuario.nome,
         t.data_fechamento,
+        t.data_prazo,
         t.status
     )
     FROM Tarefa t    
-    ORDER BY t.titulo
+    ORDER BY t.data_abertura
 """)
 
     List<TarefaSaidaDTO> listarTodasTarefas();
@@ -35,12 +36,13 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
         t.usuario.id,
         t.usuario.nome,
         t.data_fechamento,
+        t.data_prazo,
         t.status
     )
     FROM Tarefa t
-    WHERE t.status = 'ABERTA'
+    WHERE t.status   = 'ABERTA'
     AND t.usuario.id = :usuarioId
-    ORDER BY t.titulo
+    ORDER BY t.data_abertura
 """)
      List<TarefaSaidaDTO> listarTarefasPorUsuario(@Param("usuarioId") Long usuarioId);
 

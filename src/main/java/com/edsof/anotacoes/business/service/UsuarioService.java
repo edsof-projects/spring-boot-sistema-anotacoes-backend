@@ -43,7 +43,7 @@ public class UsuarioService {
                         ? FOTO_PADRAO
                         : usuario.getUrlfoto();
 
-        String urlFoto = "http://localhost:8080/uploads/usuarios/" + nomeFoto;
+        String urlFoto = "http://localhost:8081/uploads/usuarios/" + nomeFoto;
 
         System.out.println(usuario.getNivelAcesso());
 
@@ -55,6 +55,26 @@ public class UsuarioService {
                 usuario.getNivelAcesso().getId(),
                 urlFoto
         );
+    }
+
+    // DTO de ENTRADA → Entity
+    private Usuario toEntity(UsuarioEntradaDTO dto) {
+
+        if (dto.getNivelAcessoId() == null) {
+            throw new RuntimeException("nivelAcessoId é obrigatório");
+        }
+
+        NivelAcesso nivelAcesso = nivelAcessoRepository.findById(dto.getNivelAcessoId())
+                .orElseThrow(() -> new RuntimeException("Nível de acesso não encontrado"));
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.getNome());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        usuario.setNivelAcesso(nivelAcesso);
+        usuario.setDatacad(LocalDate.now());
+
+        return usuario;
     }
 
     public Usuario salvarFoto(Long id, MultipartFile file) throws IOException {
@@ -78,26 +98,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    // DTO de ENTRADA → Entity
-    private Usuario toEntity(UsuarioEntradaDTO dto) {
-
-        if (dto.getNivelAcessoId() == null) {
-            throw new RuntimeException("nivelAcessoId é obrigatório");
-        }
-
-        NivelAcesso nivelAcesso = nivelAcessoRepository.findById(dto.getNivelAcessoId())
-                .orElseThrow(() -> new RuntimeException("Nível de acesso não encontrado"));
-
-        Usuario usuario = new Usuario();
-        usuario.setNome(dto.getNome());
-        usuario.setEmail(dto.getEmail());
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        usuario.setNivelAcesso(nivelAcesso);
-        usuario.setDatacad(LocalDate.now());
-
-        return usuario;
-    }
-
     public List<UsuarioSaidaDTO> listarTodos() {
         return usuarioRepository.listarUsuarios();
     }
@@ -106,6 +106,10 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         return toSaidaDTO(usuario);
+    }
+
+    public String buscarUrlFoto(Long id) {
+        return usuarioRepository.getUrlFoto(id);
     }
 
     public Usuario buscarUsuarioPorEmail(String email){
@@ -119,7 +123,7 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 
-    // CREATE
+    // CREATE USUÁRIO
     public UsuarioSaidaDTO cadastrar(UsuarioEntradaDTO dto) throws IOException {
 
         // Valida email
