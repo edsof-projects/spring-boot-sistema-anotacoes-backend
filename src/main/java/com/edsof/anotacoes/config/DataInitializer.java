@@ -44,7 +44,7 @@ public class DataInitializer {
                 usuario.setNome("Edi Aquino de souza");
                 usuario.setEmail("edsouzzas@gmail.com");
                 usuario.setSenha(passwordEncoder.encode("eas1708")); // 🔐 senha criptografada
-                usuario.setUrlfoto("29d2961c-7744-4fbd-9749-762d01e72cbd_Edi.png");
+                usuario.setUrlfoto("default-photo.png");
                 usuario.setDatacad(LocalDate.now());
                 usuario.setNivelAcesso(admin);
 
