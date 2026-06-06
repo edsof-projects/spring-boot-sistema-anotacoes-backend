@@ -14,23 +14,6 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void enviarEmailConfirmacao(String destino, String nomeUsuario, String token) throws MessagingException {
-        String link = "http://localhost:5173/auth/confirmar-cadastro?token=" + token;
-
-        String corpoEmail = "<p>Olá, <strong>" + nomeUsuario + "</strong>,</p>"
-                + "<p>Bem-vindo! Clique no link abaixo para confirmar seu cadastro e definir sua senha pessoal:</p>"
-                + "<p><a href=\"" + link + "\">Confirmar cadastro</a></p>";
-
-        MimeMessage mimeMessage  = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-        helper.setTo(destino);
-        helper.setSubject("Confirmação de Cadastro");
-        helper.setText(corpoEmail, true); // true = envia como HTML
-
-        mailSender.send(mimeMessage);
-    }
-
     public void enviarEmailAlteracao(String destino, String nomeUsuario, String token) throws MessagingException {
         String link = "http://localhost:5173/auth/alterar-senha?token=" + token;
 

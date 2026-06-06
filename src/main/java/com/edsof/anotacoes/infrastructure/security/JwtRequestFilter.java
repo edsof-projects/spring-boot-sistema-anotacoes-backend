@@ -23,7 +23,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
             "/auth/login",
             "/usuarios/register",
-            "/auth/confirmar-cadastro",
             "/auth/enviar-email",
             "/auth/salvar-senha"
     );
