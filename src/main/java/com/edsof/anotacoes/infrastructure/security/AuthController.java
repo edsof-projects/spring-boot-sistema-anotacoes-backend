@@ -1,10 +1,12 @@
 package com.edsof.anotacoes.infrastructure.security;
 
 import com.edsof.anotacoes.business.service.EmailService;
+import com.edsof.anotacoes.business.service.UsuarioService;
 import com.edsof.anotacoes.infrastructure.entity.PasswordResetToken;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
 import com.edsof.anotacoes.infrastructure.repository.PasswordResetTokenRepository;
 import com.edsof.anotacoes.infrastructure.repository.UsuarioRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -34,6 +33,9 @@ public class AuthController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -85,8 +87,9 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/recuperar-senha")
-    public ResponseEntity<?> recuperarSenha(@RequestBody Map<String, String> body) {
+    // ENVIANDO EMAIL COM TOKEN PARA ALTERAÇÃO DE SENHA
+    @PostMapping("/enviar-email")
+    public ResponseEntity<?> resetarSenha(@RequestBody Map<String, String> body) {
 
         String email = body.get("email");
 
@@ -106,7 +109,8 @@ public class AuthController {
 
                 tokenRepository.save(resetToken);
 
-                emailService.enviarEmailRecuperacao(email, token);
+                //Gera e envia o email com uri para alteração da senha
+                emailService.enviarEmailAlteracao(email, usuario.getNome(), token);
 
             } catch (Exception e) {
                 e.printStackTrace(); // veja o erro real no console
@@ -115,41 +119,55 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 Map.of("message",
-                        "Se e-mail cadastrado, acesse sua caixa de entrada para instruções.")
+                        "E-mail cadastrado, acesse sua caixa de entrada para instruções.")
         );
     }
 
-    @PostMapping("/resetar-senha")
-    public ResponseEntity<?> resetarSenha(@RequestBody Map<String, String> body) {
+    // SALVAR ALTERAÇÃO DE SENHA SOLICITADA POR E-MAIL
+    @PutMapping("/salvar-senha")
+    public ResponseEntity<?> salvarSenha(@RequestBody Map<String, String> body) throws MessagingException {
+        String token                    = body.get("token");
+        String novaSenha                = body.get("novaSenha");
+        String email                    = body.get("email");
 
-        String token = body.get("token");
-        String novaSenha = body.get("novaSenha");
+        Optional<Usuario> usuarioOpt          = usuarioRepository.findByEmail(email);
 
         Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(token);
 
-        if (tokenOpt.isEmpty()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Token inválido."));
+        if (tokenOpt.isEmpty() || tokenOpt.get().getExpiration().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Token inválido ou expirado"));
         }
 
-        PasswordResetToken resetToken = tokenOpt.get();
-
-        if (resetToken.getExpiration().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Token expirado."));
-        }
-
-        Usuario usuario = resetToken.getUsuario();
-
+        Usuario usuario = tokenOpt.get().getUsuario();
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
 
-        // remove token após uso
-        tokenRepository.delete(resetToken);
+        tokenRepository.delete(tokenOpt.get());
 
-        return ResponseEntity.ok(
-                Map.of("message", "Senha redefinida com sucesso.")
-        );
+        return ResponseEntity.ok(Map.of("message", "Cadastro confirmado e senha definida com sucesso!"));
+    }
+
+    // CONFIRMAR CADASTRO
+    @PostMapping("/confirmar-cadastro")
+    public ResponseEntity<?> confirmarCadastro(@RequestBody Map<String, String> body) throws MessagingException {
+        String token                            = body.get("token");
+        String novaSenha                        = body.get("novaSenha");
+        String email                            = body.get("email");
+        Optional<Usuario> usuarioOpt            = usuarioRepository.findByEmail(email);
+
+        Optional<PasswordResetToken> tokenOpt   = tokenRepository.findByToken(token);
+
+        if (tokenOpt.isEmpty() || tokenOpt.get().getExpiration().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Token inválido ou expirado"));
+        }
+
+        Usuario usuario = tokenOpt.get().getUsuario();
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+        emailService.enviarEmailConfirmacao(email, usuario.getNome(), token);
+        tokenRepository.delete(tokenOpt.get());
+
+        return ResponseEntity.ok(Map.of("message", "Cadastro confirmado e senha definida com sucesso!"));
     }
 
 }

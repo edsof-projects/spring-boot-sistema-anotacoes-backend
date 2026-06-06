@@ -12,11 +12,21 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+
+    // Lista de endpoints públicos
+    private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/auth/login",
+            "/usuarios/register",
+            "/auth/confirmar-cadastro",
+            "/auth/enviar-email",
+            "/auth/salvar-senha"
+    );
 
     public JwtRequestFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
@@ -27,6 +37,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getServletPath();
+
+        // Ignora endpoints públicos
+        if (PUBLIC_ENDPOINTS.contains(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authorizationHeader = request.getHeader("Authorization");
 

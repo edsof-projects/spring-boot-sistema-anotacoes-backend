@@ -1,5 +1,6 @@
 package com.edsof.anotacoes.infrastructure.entity;
 
+import com.edsof.anotacoes.infrastructure.dtos.UsuarioEntradaDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +26,6 @@ public class PasswordResetToken {
     @ManyToOne
     private Usuario usuario;
 
+    public PasswordResetToken(String token, UsuarioEntradaDTO dto, LocalDateTime localDateTime) {
+    }
 }
