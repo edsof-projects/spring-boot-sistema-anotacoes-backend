@@ -62,7 +62,6 @@ public class SecurityConfig {
 
                         //POST, PUT, DELETE só para ADMIN
                         .requestMatchers("/usuarios/register")          .permitAll()
-                        .requestMatchers("/auth/confirmar-cadastro")    .permitAll()
                         .requestMatchers("/auth/enviar-email")          .permitAll()
                         .requestMatchers("/auth/salvar-senha")          .permitAll()
 

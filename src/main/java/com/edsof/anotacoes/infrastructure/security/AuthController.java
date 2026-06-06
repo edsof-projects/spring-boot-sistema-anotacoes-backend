@@ -87,7 +87,7 @@ public class AuthController {
         }
     }
 
-    // ENVIANDO EMAIL COM TOKEN PARA ALTERAÇÃO DE SENHA
+    // ENVIANDO EMAIL COM TOKEN PARA ALTERAÇÃO DE SENHA PELO LINK -> ESQUECI A SENHA
     @PostMapping("/enviar-email")
     public ResponseEntity<?> resetarSenha(@RequestBody Map<String, String> body) {
 
@@ -123,14 +123,14 @@ public class AuthController {
         );
     }
 
-    // SALVAR ALTERAÇÃO DE SENHA SOLICITADA POR E-MAIL
+    // SALVAR ALTERAÇÃO DE SENHA SOLICITADA POR E-MAIL ATRAVES DO FORM RESETAR SENHA
     @PutMapping("/salvar-senha")
     public ResponseEntity<?> salvarSenha(@RequestBody Map<String, String> body) throws MessagingException {
-        String token                    = body.get("token");
-        String novaSenha                = body.get("novaSenha");
-        String email                    = body.get("email");
+        String token = body.get("token");
+        String novaSenha = body.get("novaSenha");
+        String email = body.get("email");
 
-        Optional<Usuario> usuarioOpt          = usuarioRepository.findByEmail(email);
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
         Optional<PasswordResetToken> tokenOpt = tokenRepository.findByToken(token);
 
@@ -144,30 +144,6 @@ public class AuthController {
 
         tokenRepository.delete(tokenOpt.get());
 
-        return ResponseEntity.ok(Map.of("message", "Cadastro confirmado e senha definida com sucesso!"));
+        return ResponseEntity.ok(Map.of("message", "Senha redefinida com sucesso!"));
     }
-
-    // CONFIRMAR CADASTRO
-    @PostMapping("/confirmar-cadastro")
-    public ResponseEntity<?> confirmarCadastro(@RequestBody Map<String, String> body) throws MessagingException {
-        String token                            = body.get("token");
-        String novaSenha                        = body.get("novaSenha");
-        String email                            = body.get("email");
-        Optional<Usuario> usuarioOpt            = usuarioRepository.findByEmail(email);
-
-        Optional<PasswordResetToken> tokenOpt   = tokenRepository.findByToken(token);
-
-        if (tokenOpt.isEmpty() || tokenOpt.get().getExpiration().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Token inválido ou expirado"));
-        }
-
-        Usuario usuario = tokenOpt.get().getUsuario();
-        usuario.setSenha(passwordEncoder.encode(novaSenha));
-        usuarioRepository.save(usuario);
-        emailService.enviarEmailConfirmacao(email, usuario.getNome(), token);
-        tokenRepository.delete(tokenOpt.get());
-
-        return ResponseEntity.ok(Map.of("message", "Cadastro confirmado e senha definida com sucesso!"));
-    }
-
 }
