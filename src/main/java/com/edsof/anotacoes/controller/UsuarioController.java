@@ -1,11 +1,14 @@
 package com.edsof.anotacoes.controller;
 
+import com.edsof.anotacoes.business.service.EmailService;
 import com.edsof.anotacoes.business.service.UsuarioService;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioEntradaDTO;
 import com.edsof.anotacoes.infrastructure.dtos.UsuarioSaidaDTO;
 import com.edsof.anotacoes.infrastructure.entity.Usuario;
+import com.edsof.anotacoes.infrastructure.repository.PasswordResetTokenRepository;
 import com.edsof.anotacoes.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,12 @@ public class UsuarioController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    @Autowired
+    private PasswordResetTokenRepository tokenRepository;
+
+    @Autowired
+    private EmailService emailService;
+
     // LISTAR TODOS
     @GetMapping
     public List<UsuarioSaidaDTO> listarTodos() {
@@ -44,6 +53,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
     }
 
+    //OBTER A FOTO DO USUARIO
     @GetMapping("/usuarios/{id}/foto")
     public ResponseEntity<String> getFotoUsuario(@PathVariable Long id) {
         String urlFoto = usuarioService.buscarUrlFoto(id);
@@ -61,7 +71,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioDTO);
     }
 
-    // CADASTRAR
+    // CADASTRAR NOVO USUARIO PELO ADMIN
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsuarioSaidaDTO> cadastrar(
 
@@ -81,6 +91,22 @@ public class UsuarioController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(usuarioCadastrado);
+    }
+
+    // REGISTRAR USUARIO NAO CADASTRADO A PARTIR DA TELA DE LOGIN
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registrar(
+            @RequestPart("usuario") UsuarioEntradaDTO dto,
+            @RequestPart(value = "foto", required = false) MultipartFile foto
+    ) throws IOException {
+        dto.setFoto(foto);
+
+        try {
+            UsuarioSaidaDTO usuarioCadastrado = usuarioService.cadastrar(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     // EDITAR POR ID
